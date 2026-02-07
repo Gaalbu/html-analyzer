@@ -11,8 +11,9 @@ public class HtmlAnalyzer {
     public static void main(String[] args) throws Exception {
         if (args.length == 0) return; //url inválida
         String urlString = args[0];
-        Stack<String> pilha = new Stack<>();
+        Stack<String> pilhaTags = new Stack<>();
         int profundidadeMaxima = -1;
+        int profundidadeAtual = -1;
         String textoMaisProfundo = "";
 
         try {
@@ -22,23 +23,45 @@ public class HtmlAnalyzer {
                 linhaAtual = linhaAtual.trim(); // s/indentação
                 if (linhaAtual.isEmpty()) continue;
                 
-                //tag de abertura
-                if(linhaAtual.charAt(0) == '<'){ 
-                
-                    //fechamento
-                    if(linhaAtual.charAt(1) == '/'){ 
-                        
+                if(linhaAtual.startsWith("<") ){ 
+                    if(linhaAtual.startsWith("</")){ 
+                        //fechamento
+                        if (pilhaTags.isEmpty()){
+                            System.out.println("malformed HTML");
+                            return;
+                        }
+
+                    
+                    String tagAberta = pilhaTags.pop();
+                    if(!tagAberta.replace("<","").replace(">", "")
+                            .equals(linhaAtual.replace("/", "").replace(">",""))){
+                        System.out.println("malformedHTML");
+                        return;
+                    }
+                    profundidadeAtual--;
+                    }else{  
+                        //tag abertura
+                        pilhaTags.push(linhaAtual);
+                        profundidadeAtual++;
+                        profundidadeMaxima = profundidadeMaxima < profundidadeAtual ? profundidadeAtual : profundidadeMaxima;
+                    }
+                }else{
+                    //aqui é o texto de fato
+                    if (profundidadeAtual > profundidadeMaxima){
+                        profundidadeMaxima = profundidadeAtual;
+                        textoMaisProfundo = linhaAtual;
+                    }else if (profundidadeAtual == profundidadeMaxima && textoMaisProfundo.isEmpty()){
+                        textoMaisProfundo = linhaAtual;
                     }
                 }
-
-            
             }
+            
+            System.out.println(!pilhaTags.isEmpty() ? "malformedHTML" : textoMaisProfundo);
+
         } catch (ConnectException connectionError){
             System.err.println("URL connection error");
 
         }
-
-       
 
     }
 
