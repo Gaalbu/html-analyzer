@@ -22,3 +22,12 @@ To comply with the project requirements, the solution follows these premises:
 1. **Compile the program:**
    ```bash
    javac HtmlAnalyzer.java
+   ```
+2. **Compile the program:**
+   ```bash
+   java HtmlAnalyzer http://hiring.axreng.com/internship/example2.html
+   ```
+## Expected Outputs
+- **Sucess:** The deepest text found in the HTML.
+- **Error 1:** ```malformed HTML``` if the tags are not properly nested or closed.
+- **Error 2:** ```URL connection error``` if the URL is unreachable.
